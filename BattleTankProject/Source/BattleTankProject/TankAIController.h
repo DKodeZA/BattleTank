@@ -17,11 +17,13 @@ class BATTLETANKPROJECT_API ATankAIController : public AAIController
 
 public:
 	void BeginPlay() override;
-
-	ATank *GetAIController() const;
 	
 private:
 
 	ATank *AITank = nullptr;
+	ATank *PlayerTank = nullptr;
+
+	ATank *GetAIController() const;
+	ATank *GetPlayerTank() const;
 	
 };
