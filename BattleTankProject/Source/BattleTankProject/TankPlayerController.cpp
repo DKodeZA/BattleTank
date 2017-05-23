@@ -6,10 +6,9 @@
 void ATankPlayerController::BeginPlay() {
 
 	Super::BeginPlay();
-	PlayerTank = GetControlledTank();
 
-	if (PlayerTank != nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("Player Pawn: %s"), *PlayerTank->GetName());
+	if (GetControlledTank() != nullptr) {
+		UE_LOG(LogTemp, Warning, TEXT("Player Pawn: %s"), *GetControlledTank()->GetName());
 	}
 	else {
 		UE_LOG(LogTemp, Warning, TEXT("Player Pawn not found"));
@@ -29,12 +28,12 @@ ATank *ATankPlayerController::GetControlledTank() const {
 }
 
 void ATankPlayerController::AimTowardsCrosshair() {
-	if (!PlayerTank) { return; }
+	if (!GetControlledTank()) { return; }
 
 	FVector HitLocation;
 
 	if (GetSightRayHitLocation(HitLocation)) {
-
+		GetControlledTank()->AimAt(HitLocation);
 	}
 	
 }
@@ -48,7 +47,8 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &HitLocation) const{
 	FVector LookDirection;
 
 	if (GetLookDirection(ScreenLocation, LookDirection)) {
-		UE_LOG(LogTemp, Warning, TEXT("World Direction: %s"), *LookDirection.ToString());
+
+		GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
 	return true;
 }
@@ -56,4 +56,18 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &HitLocation) const{
 bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector &LookDirection) const{
 	FVector CameraWorldLocation;
 	return DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, CameraWorldLocation, LookDirection);
+}
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector &TargetLocation) const{
+	FHitResult HitResult;
+	FVector TraceStart = PlayerCameraManager->GetCameraLocation();
+	FVector TraceEnd = TraceStart+(LookDirection*LineTraceRange);
+	bool isHit = GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility);
+	if (isHit) {
+		TargetLocation = HitResult.Location;
+	}
+	else {
+		TargetLocation = FVector(0.f);
+	}
+	return isHit;
 }

@@ -21,16 +21,18 @@ public:
 	void Tick(float DeltaTime) override;
 	
 private:
-	ATank *PlayerTank = nullptr;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category= "Tank Aim")
 	float CrosshairXLocation = 0.5f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Tank Aim")
 	float CrosshairYLocation = 0.33333f;
+
+	UPROPERTY(EditAnywhere, Category="Tank Aim")
+	float LineTraceRange = 1000000.f;
 
 	//Move barrel to crosshair
 	void AimTowardsCrosshair();
 
 	bool GetSightRayHitLocation(FVector&)const;
 	bool GetLookDirection(FVector2D, FVector&) const;
+	bool GetLookVectorHitLocation(FVector, FVector&)const;
 };
